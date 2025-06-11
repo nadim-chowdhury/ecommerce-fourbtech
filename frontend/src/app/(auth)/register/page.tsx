@@ -46,7 +46,7 @@ export default function RegisterPage() {
           </h1>
           <div className="flex items-center justify-center space-x-2">
             <p className="text-slate-600">Register your account</p>
-            <span>OR</span>
+            <span>Or</span>
             <Link href="/" className="text-blue-600">
               Return home
             </Link>

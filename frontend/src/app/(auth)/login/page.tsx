@@ -45,7 +45,7 @@ export default function LoginPage() {
           </h1>
           <div className="flex items-center justify-center space-x-2">
             <p className="text-slate-600">Log in to your account</p>
-            <span>OR</span>
+            <span>Or</span>
             <Link href="/" className="text-blue-600">
               Return home
             </Link>
