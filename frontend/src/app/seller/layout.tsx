@@ -14,7 +14,7 @@ export default function SellerLayout({
 
       <div className="flex">
         <DashboardSidebar />
-        <div className="bg-neutral-100">{children}</div>
+        <div className="bg-neutral-100 w-full">{children}</div>
       </div>
     </div>
   );

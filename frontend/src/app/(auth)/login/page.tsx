@@ -32,7 +32,7 @@ export default function LoginPage() {
     console.log("Login data:", formData);
 
     setIsLoading(false);
-    router.push("/dashboard"); // Redirect after successful login
+    router.push("/seller/overview"); // Redirect after successful login
   };
 
   return (
