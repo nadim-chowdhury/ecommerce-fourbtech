@@ -10,7 +10,7 @@ export default function SellerLayout({
   return (
     <div>
       <DashboardHeader />
-      <DashboardNavbar />
+      <DashboardNavbar className="px-16" />
 
       <div className="flex">
         <DashboardSidebar />

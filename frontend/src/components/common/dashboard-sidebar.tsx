@@ -1,22 +1,30 @@
 "use client";
 
 import {
-  BarChart3,
   Package,
   ShoppingCart,
   CreditCard,
   Settings,
+  Home,
+  Truck,
+  User,
+  CircleHelp,
+  Heart,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { Button } from "../ui/button";
 
 export default function DashboardSidebar() {
+  const [userRole, setUserRole] = useState<any>(false);
+
   const pathname = usePathname();
 
   const sellerSidebarItems = [
     {
       id: 1,
-      icon: BarChart3,
+      icon: Home,
       label: "Overview",
       badge: null,
       link: "/seller/overview",
@@ -48,6 +56,51 @@ export default function DashboardSidebar() {
       label: "Settings",
       badge: null,
       link: "/seller/settings",
+    },
+  ];
+
+  const customerSidebarItems = [
+    {
+      id: 1,
+      icon: Home,
+      label: "Overview",
+      badge: null,
+      link: "/customer/overview",
+    },
+    {
+      id: 2,
+      icon: Truck,
+      label: "My Orders",
+      badge: "12",
+      link: "/customer/my-orders",
+    },
+    {
+      id: 3,
+      icon: Heart,
+      label: "Wishlist",
+      badge: "3",
+      link: "/customer/wishlist",
+    },
+    {
+      id: 4,
+      icon: User,
+      label: "Profile",
+      badge: null,
+      link: "/customer/profile",
+    },
+    {
+      id: 5,
+      icon: CircleHelp,
+      label: "Support",
+      badge: null,
+      link: "/customer/support",
+    },
+    {
+      id: 6,
+      icon: Settings,
+      label: "Settings",
+      badge: null,
+      link: "/customer/settings",
     },
   ];
 
@@ -90,14 +143,28 @@ export default function DashboardSidebar() {
     <div className="bg-white border-r transition-all duration-300 flex flex-col pl-14 w-[360px] h-full sticky top-0">
       {/* Main Navigation */}
       <nav className="flex-1 py-4 space-y-1">
-        {sellerSidebarItems.map((item) => (
-          <SidebarItem
-            key={item.id}
-            item={item}
-            isActive={pathname === item.link}
-          />
-        ))}
+        {(userRole === "seller" || userRole) &&
+          sellerSidebarItems.map((item) => (
+            <SidebarItem
+              key={item.id}
+              item={item}
+              isActive={pathname === item.link}
+            />
+          ))}
+
+        {(userRole === "customer" || !userRole) &&
+          customerSidebarItems.map((item) => (
+            <SidebarItem
+              key={item.id}
+              item={item}
+              isActive={pathname === item.link}
+            />
+          ))}
       </nav>
+
+      <div>
+        <Button onClick={() => setUserRole(!userRole)}>Change Role</Button>
+      </div>
     </div>
   );
 }

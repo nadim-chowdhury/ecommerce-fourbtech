@@ -184,7 +184,7 @@ const SEARCH_SUGGESTIONS = [
   "Coffee Maker",
 ];
 
-export default function DashboardNavbar() {
+export default function DashboardNavbar({ className }: any) {
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -205,7 +205,9 @@ export default function DashboardNavbar() {
   };
 
   return (
-    <div className="px-16 py-4 border-b flex items-center justify-between gap-6">
+    <div
+      className={`${className} py-4 border-b flex items-center justify-between gap-6`}
+    >
       <div className="w-full flex items-center bg-white border rounded-md overflow-hidden">
         {/* Categories Dropdown */}
         <Popover>
