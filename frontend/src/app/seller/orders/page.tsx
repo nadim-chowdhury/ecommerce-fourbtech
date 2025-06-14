@@ -89,13 +89,10 @@ const OrdersDashboard = () => {
     startIndex + itemsPerPage
   );
 
-  const handleViewOrder = (order: any) => {
+  const handleShipOrder = (order: any) => {
     setSelectedOrder(order);
     setIsDialogOpen(true);
-  };
-
-  const handleShipOrder = (orderId: any) => {
-    console.log("Shipping order:", orderId);
+    console.log("Shipping order:", order);
   };
 
   const handleTabChange = (value: any) => {
@@ -142,7 +139,6 @@ const OrdersDashboard = () => {
           <TabsContent value="all" className="mt-6">
             <OrdersTable
               orders={paginatedOrders}
-              onViewOrder={handleViewOrder}
               onShipOrder={handleShipOrder}
             />
             <TablePagination
@@ -157,7 +153,6 @@ const OrdersDashboard = () => {
           <TabsContent value="pending" className="mt-6">
             <OrdersTable
               orders={paginatedOrders}
-              onViewOrder={handleViewOrder}
               onShipOrder={handleShipOrder}
             />
             <TablePagination
@@ -172,7 +167,6 @@ const OrdersDashboard = () => {
           <TabsContent value="shipped" className="mt-6">
             <OrdersTable
               orders={paginatedOrders}
-              onViewOrder={handleViewOrder}
               onShipOrder={handleShipOrder}
             />
             <TablePagination
@@ -187,7 +181,6 @@ const OrdersDashboard = () => {
           <TabsContent value="cancelled" className="mt-6">
             <OrdersTable
               orders={paginatedOrders}
-              onViewOrder={handleViewOrder}
               onShipOrder={handleShipOrder}
             />
             <TablePagination

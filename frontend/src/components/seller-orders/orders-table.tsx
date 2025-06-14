@@ -9,8 +9,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { StatusBadge } from "./order-status-badge";
+import Link from "next/link";
 
-export const OrdersTable = ({ orders, onViewOrder, onShipOrder }: any) => {
+export const OrdersTable = ({ orders, onShipOrder }: any) => {
   return (
     <div className="bg-white rounded-lg border overflow-hidden">
       <Table>
@@ -36,19 +37,21 @@ export const OrdersTable = ({ orders, onViewOrder, onShipOrder }: any) => {
               </TableCell>
               <TableCell className="px-6">
                 <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onViewOrder(order)}
-                    className="flex items-center gap-1"
-                  >
-                    <Eye size={16} />
-                    View
-                  </Button>
+                  <Link href={`/seller/orders/${order.id.toLowerCase()}`}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      // onClick={() => onViewOrder(order)}
+                      className="flex items-center gap-1"
+                    >
+                      <Eye size={16} />
+                      View
+                    </Button>
+                  </Link>
                   {order.status === "Pending" && (
                     <Button
                       size="sm"
-                      onClick={() => onShipOrder(order.id)}
+                      onClick={() => onShipOrder(order)}
                       className="bg-red-500 hover:bg-red-600 flex items-center gap-1"
                     >
                       <Ship size={16} />
