@@ -54,10 +54,10 @@ export default function DashboardSidebar() {
   const SidebarItem = ({ item, isActive, onClick }: any) => {
     const IconComponent = item.icon;
     return (
-      <Link href={item.link}>
+      <Link href={item.link} className="w-full">
         <button
           onClick={() => onClick(item.id)}
-          className={`w-[95%] flex items-center gap-3 px-4 py-3 text-left transition-all duration-200 rounded-lg mx-2 cursor-pointer ${
+          className={`w-[92%] flex items-center gap-3 px-4 py-3 text-left transition-all duration-200 rounded-lg mx-2 cursor-pointer ${
             isActive
               ? "bg-red-50 text-red-600"
               : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
