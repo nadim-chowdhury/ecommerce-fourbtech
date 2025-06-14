@@ -4,16 +4,11 @@ import { useState, useEffect } from "react";
 import {
   Search,
   Plus,
-  Edit,
-  Trash2,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   AlertTriangle,
   Trash,
   X,
 } from "lucide-react";
-import Image from "next/image";
 import {
   Popover,
   PopoverContent,
@@ -21,6 +16,8 @@ import {
 } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import Link from "next/link";
+import { TablePagination } from "@/components/common/table-pagination";
+import ProductsTable from "@/components/seller-products/products-table";
 
 // Mock data - expanded for pagination demo
 const initialProducts = [
@@ -149,7 +146,7 @@ const categories = [
 
 const stockStatuses = ["All", "Active", "Low stock", "Out of stock"];
 
-const ProductsTable = () => {
+const ProductsPage = () => {
   const [products, setProducts] = useState(initialProducts);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
@@ -161,25 +158,7 @@ const ProductsTable = () => {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(7);
-
-  const getStatusColor = (status: any) => {
-    switch (status) {
-      case "Active":
-        return "text-green-600 bg-green-100 border-green-200";
-      case "Low Stock":
-        return "text-orange-600 bg-orange-100 border-orange-200";
-      case "Out of Stock":
-        return "text-red-600 bg-red-100 border-red-200";
-      default:
-        return "text-gray-600 bg-gray-100 border-gray-200";
-    }
-  };
-
-  const handleDeleteClick = (product: any) => {
-    setProductToDelete(product);
-    setDeleteDialogOpen(true);
-  };
+  const itemsPerPage = 10;
 
   const handleDeleteConfirm = () => {
     if (productToDelete) {
@@ -221,11 +200,6 @@ const ProductsTable = () => {
 
   const handlePageChange = (page: any) => {
     setCurrentPage(page);
-  };
-
-  const handleItemsPerPageChange = (items: any) => {
-    setItemsPerPage(items);
-    setCurrentPage(1);
   };
 
   return (
@@ -321,153 +295,20 @@ const ProductsTable = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white border rounded-lg overflow-hidden shadow-sm">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Image
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                SKU
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Price
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Stock
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {currentProducts.map((product) => (
-              <tr
-                key={product.id}
-                className="hover:bg-gray-50 transition-colors"
-              >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="w-10 h-10 bg-gray-100 rounded-lg overflow-hidden p-1">
-                    <Image
-                      src="https://pngimg.com/uploads/box/box_PNG41.png"
-                      alt="Demo Image"
-                      width={360}
-                      height={360}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">
-                    {product.name}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-500">{product.sku}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">${product.price}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{product.stock}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`inline-flex px-2 py-1 text-xs font-medium rounded-md border ${getStatusColor(
-                      product.status
-                    )}`}
-                  >
-                    {product.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <div className="flex items-center gap-2">
-                    <Link
-                      href={`/seller/products/${product.id}/edit`}
-                      className="no-underline"
-                    >
-                      <button className="text-gray-600 hover:text-gray-900 p-1 hover:bg-gray-100 rounded transition-colors border flex items-center gap-2 px-4 py-2 cursor-pointer">
-                        <Edit className="w-4 h-4" /> Edit
-                      </button>
-                    </Link>
-                    <button
-                      onClick={() => handleDeleteClick(product)}
-                      className="text-red-600 hover:text-red-800 p-1 hover:bg-red-50 rounded transition-colors border flex items-center gap-2 px-4 py-2 cursor-pointer"
-                    >
-                      <Trash2 className="w-4 h-4" /> Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ProductsTable
+        currentProducts={currentProducts}
+        setProductToDelete={setProductToDelete}
+        setDeleteDialogOpen={setDeleteDialogOpen}
+      />
 
       {/* Pagination */}
-      <div className="mt-6 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-700">Show</span>
-          <select
-            value={itemsPerPage}
-            onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-            className="border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-          >
-            <option value={5}>5</option>
-            <option value={7}>7</option>
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-          </select>
-          <span className="text-sm text-gray-700">entries</span>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-700">
-            Showing {startIndex + 1} to {Math.min(endIndex, totalItems)} of{" "}
-            {totalItems} entries
-          </span>
-
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="p-2 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                className={`px-3 py-1 rounded text-sm transition-colors ${
-                  currentPage === page
-                    ? "bg-red-500 text-white"
-                    : "hover:bg-gray-100 text-gray-700"
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="p-2 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
+      <TablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        itemsPerPage={itemsPerPage}
+        onPageChange={handlePageChange}
+      />
 
       {/* Delete Confirmation Modal */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
@@ -516,14 +357,8 @@ const ProductsTable = () => {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* {deleteDialogOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-         
-        </div>
-      )} */}
     </div>
   );
 };
 
-export default ProductsTable;
+export default ProductsPage;

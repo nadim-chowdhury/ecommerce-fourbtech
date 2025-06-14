@@ -70,8 +70,8 @@ const SellerOverview = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen w-full bg-gray-50 p-6 pr-16">
+      <div className="space-y-8">
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-3xl font-bold text-gray-900">

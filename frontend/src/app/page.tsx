@@ -91,11 +91,13 @@ export default function Home() {
               principles.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-xl transition-all duration-200 flex items-center justify-center cursor-pointer">
-                <Globe className="w-5 h-5 mr-2" />
-                Live Demo
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </button>
+              <Link href="/seller/overview">
+                <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-xl transition-all duration-200 flex items-center justify-center cursor-pointer">
+                  <Globe className="w-5 h-5 mr-2" />
+                  Live Demo
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </button>
+              </Link>
               <button className="border-2 border-slate-200 text-slate-700 px-8 py-3 rounded-lg font-semibold hover:border-slate-300 hover:shadow-md transition-all duration-200 flex items-center justify-center cursor-pointer">
                 <Github className="w-5 h-5 mr-2" />
                 View Code
