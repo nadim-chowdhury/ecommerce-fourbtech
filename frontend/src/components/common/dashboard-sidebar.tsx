@@ -87,7 +87,7 @@ export default function DashboardSidebar() {
   };
 
   return (
-    <div className="bg-white border-r transition-all duration-300 flex flex-col pl-14 w-80 h-full sticky top-0">
+    <div className="bg-white border-r transition-all duration-300 flex flex-col pl-14 w-[360px] h-full sticky top-0">
       {/* Main Navigation */}
       <nav className="flex-1 py-4 space-y-1">
         {sellerSidebarItems.map((item) => (
