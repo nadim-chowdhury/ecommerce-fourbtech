@@ -55,7 +55,7 @@ export const OrderDialog = ({ order, isOpen, onClose }: any) => {
           </Button>
           <Button
             onClick={handleShipOrder}
-            className="bg-red-500 hover:bg-red-600 flex items-center gap-2"
+            className="bg-red-600 hover:bg-red-700 flex items-center gap-2"
           >
             <Ship size={16} />
             Ship Order

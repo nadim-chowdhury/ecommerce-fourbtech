@@ -145,7 +145,7 @@ export default function MyOrders() {
   });
 
   return (
-    <div className="min-h-screen p-6 pr-16 space-y-8">
+    <div className="min-h-screen p-6 pr-16 space-y-6">
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold tracking-tight">My Orders</h1>
@@ -162,11 +162,11 @@ export default function MyOrders() {
             placeholder="Search by order id"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-white"
+            className="pl-10 bg-white h-10"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="sm:w-[180px] bg-white">
+          <SelectTrigger className="sm:w-[180px] bg-white !h-10">
             <SelectValue placeholder="Order Status" />
           </SelectTrigger>
           <SelectContent>

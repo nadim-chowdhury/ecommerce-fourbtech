@@ -126,7 +126,7 @@ const CheckoutForm = () => {
                       </span>
                     </div>
                     {selectedAddress === "home" && (
-                      <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                      <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center">
                         <div className="w-2 h-2 bg-white rounded-full"></div>
                       </div>
                     )}
@@ -151,7 +151,7 @@ const CheckoutForm = () => {
                       <span className="font-medium text-gray-900">Work</span>
                     </div>
                     {selectedAddress === "work" && (
-                      <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                      <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center">
                         <div className="w-2 h-2 bg-white rounded-full"></div>
                       </div>
                     )}
@@ -389,7 +389,7 @@ const CheckoutForm = () => {
                 onChange={(e) => setPromoCode(e.target.value)}
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
-              <button className="px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors font-medium">
+              <button className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors font-medium">
                 Apply
               </button>
             </div>
@@ -445,7 +445,7 @@ const CheckoutForm = () => {
             </div>
 
             <div className="mt-6 space-y-3">
-              <button className="w-full bg-red-500 text-white py-3 rounded-md hover:bg-red-600 transition-colors font-medium">
+              <button className="w-full bg-red-600 text-white py-3 rounded-md hover:bg-red-700 transition-colors font-medium">
                 Place Order
               </button>
               <button className="w-full text-red-500 py-2 rounded-md hover:bg-red-50 transition-colors font-medium flex items-center justify-center">

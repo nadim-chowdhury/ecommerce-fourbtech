@@ -52,7 +52,7 @@ export const OrdersTable = ({ orders, onShipOrder }: any) => {
                     <Button
                       size="sm"
                       onClick={() => onShipOrder(order)}
-                      className="bg-red-500 hover:bg-red-600 flex items-center gap-1"
+                      className="bg-red-600 hover:bg-red-700 flex items-center gap-1"
                     >
                       <Ship size={16} />
                       Ship

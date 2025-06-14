@@ -176,7 +176,7 @@ const EditProductDetails = () => {
                       />
                       <button
                         onClick={() => removeImage(image.id)}
-                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100"
+                        className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors opacity-0 group-hover:opacity-100"
                       >
                         <X className="w-3 h-3" />
                       </button>

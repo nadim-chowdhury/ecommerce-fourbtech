@@ -14,10 +14,10 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Button } from "../ui/button";
+// import { Button } from "../ui/button";
 
 export default function DashboardSidebar() {
-  const [userRole, setUserRole] = useState<any>(false);
+  const [userRole] = useState<any>(false);
 
   const pathname = usePathname();
 
@@ -162,9 +162,9 @@ export default function DashboardSidebar() {
           ))}
       </nav>
 
-      <div>
+      {/* <div>
         <Button onClick={() => setUserRole(!userRole)}>Change Role</Button>
-      </div>
+      </div> */}
     </div>
   );
 }

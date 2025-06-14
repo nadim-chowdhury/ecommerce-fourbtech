@@ -35,7 +35,7 @@ export const TablePagination = ({
             size="sm"
             onClick={() => onPageChange(page)}
             className={
-              currentPage === page ? "bg-red-500 hover:bg-red-600" : ""
+              currentPage === page ? "bg-red-600 hover:bg-red-700" : ""
             }
           >
             {page}
