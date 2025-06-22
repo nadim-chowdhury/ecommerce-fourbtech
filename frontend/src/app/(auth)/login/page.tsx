@@ -3,6 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@apollo/client";
+import { LOGIN_MUTATION_GQL } from "@/graphql/mutations";
+import { client } from "@/lib/apollo-client";
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -11,28 +14,44 @@ export default function LoginPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const router = useRouter();
+  const [login] = useMutation(LOGIN_MUTATION_GQL, {
+    client: client,
+  });
 
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const { data } = await login({ variables: { input: formData } });
+      console.log(" handleSubmit ~ data:", data.login.user.role);
 
-    // Add your login logic here
-    console.log("Login data:", formData);
+      // Save token to cookies and user info to localStorage
+      if (typeof window !== "undefined" && data?.login) {
+        // Set token in cookies
+        document.cookie = `token=${data.login.access_token}; path=/;`;
+        // Store user info in localStorage
+        localStorage.setItem("user", JSON.stringify(data.login.user));
+      }
 
-    setIsLoading(false);
-    router.push("/seller/overview"); // Redirect after successful login
+      router.push(`/${data.login.user.role.toLowerCase()}/overview`);
+    } catch (err: any) {
+      setError(err.message || "Login failed");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -46,7 +65,10 @@ export default function LoginPage() {
           <div className="flex items-center justify-center space-x-2">
             <p className="text-slate-600">Log in to your account</p>
             <span>Or</span>
-            <Link href="/" className="text-blue-600">
+            <Link
+              href="/"
+              className="text-blue-600 hover:text-blue-800 transition-colors"
+            >
               Return home
             </Link>
           </div>
@@ -54,6 +76,12 @@ export default function LoginPage() {
 
         {/* Login Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email Field */}
             <div className="space-y-2">
@@ -72,6 +100,7 @@ export default function LoginPage() {
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 focus:bg-white"
                 placeholder="Enter your email"
+                disabled={isLoading}
               />
             </div>
 
@@ -93,11 +122,13 @@ export default function LoginPage() {
                   onChange={handleChange}
                   className="w-full px-4 py-3 pr-12 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 focus:bg-white"
                   placeholder="Enter your password"
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-slate-700 transition-colors"
+                  disabled={isLoading}
                 >
                   {showPassword ? (
                     <svg
@@ -143,23 +174,26 @@ export default function LoginPage() {
               <label className="flex items-center">
                 <input
                   type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
+                  disabled={isLoading}
                 />
                 <span className="ml-2 text-sm text-slate-600">Remember me</span>
               </label>
-              <span
-                // href="/forgot-password"
-                className="text-sm text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
+              <Link
+                href="/forgot-password"
+                className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
               >
                 Forgot password?
-              </span>
+              </Link>
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform active:scale-[0.98] disabled:transform-none cursor-pointer"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:transform-none disabled:opacity-70 cursor-pointer"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">

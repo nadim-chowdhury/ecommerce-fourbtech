@@ -1,0 +1,17 @@
+-- AlterTable
+ALTER TABLE "Product" ADD COLUMN     "brand" TEXT,
+ADD COLUMN     "category" TEXT,
+ADD COLUMN     "color" TEXT,
+ADD COLUMN     "color2" TEXT,
+ADD COLUMN     "condition" TEXT,
+ADD COLUMN     "enableNegotiation" BOOLEAN,
+ADD COLUMN     "features" JSONB,
+ADD COLUMN     "model" TEXT,
+ADD COLUMN     "ram" TEXT,
+ADD COLUMN     "ram2" TEXT,
+ADD COLUMN     "salePrice" DOUBLE PRECISION,
+ADD COLUMN     "seoDescription" TEXT,
+ADD COLUMN     "seoTitle" TEXT,
+ADD COLUMN     "sku" TEXT,
+ADD COLUMN     "storage" TEXT,
+ADD COLUMN     "tags" TEXT[];

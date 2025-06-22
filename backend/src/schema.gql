@@ -1,0 +1,143 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthResponse {
+  access_token: String!
+  user: User!
+}
+
+input CreateOrderInput {
+  items: [CreateOrderItemInput!]!
+}
+
+input CreateOrderItemInput {
+  productId: String!
+  quantity: Float!
+}
+
+input CreateProductInput {
+  description: String!
+  imageUrl: String
+  isActive: Boolean
+  name: String!
+  price: Float!
+  stock: Float!
+  vendorId: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  createOrder(input: CreateOrderInput!): Order!
+  createProduct(input: CreateProductInput!): Product!
+  login(input: LoginInput!): AuthResponse!
+  register(input: RegisterInput!): AuthResponse!
+  removeProduct(id: String!): Product!
+  updateOrderStatus(id: String!, input: UpdateOrderStatusInput!): Order!
+  updateProduct(id: String!, input: UpdateProductInput!): Product!
+  updateVendor(input: UpdateVendorInput!): Vendor!
+}
+
+type Order {
+  createdAt: DateTime!
+  customerId: String!
+  id: String!
+  items: [OrderItem!]!
+  status: String!
+  total: Float!
+  updatedAt: DateTime!
+}
+
+type OrderItem {
+  id: String!
+  orderId: String!
+  price: Float!
+  productId: String!
+  quantity: Float!
+}
+
+type OrderStats {
+  cancelled: Int!
+  delivered: Int!
+  pending: Int!
+  shipped: Int!
+  total: Int!
+}
+
+type Product {
+  createdAt: DateTime!
+  description: String!
+  id: String!
+  imageUrl: String
+  isActive: Boolean!
+  name: String!
+  price: Float!
+  stock: Float!
+  updatedAt: DateTime!
+  vendorId: String!
+}
+
+type Query {
+  hello: String!
+  myOrders: [Order!]!
+  order(id: String!): Order!
+  orderStats: OrderStats!
+  orders: [Order!]!
+  product(id: String!): Product!
+  products: [Product!]!
+  profile: User!
+  searchProducts(query: String!): [Product!]!
+  vendorOrders(vendorId: String!): [Order!]!
+  vendorProducts(vendorId: String!): [Product!]!
+}
+
+input RegisterInput {
+  email: String!
+  name: String!
+  password: String!
+  role: String!
+}
+
+input UpdateOrderStatusInput {
+  status: String!
+}
+
+input UpdateProductInput {
+  description: String
+  imageUrl: String
+  isActive: Boolean
+  name: String
+  price: Float
+  stock: Float
+}
+
+input UpdateVendorInput {
+  name: String
+}
+
+type User {
+  createdAt: DateTime!
+  email: String!
+  id: String!
+  name: String!
+  role: String!
+  updatedAt: DateTime!
+  vendorId: String
+}
+
+type Vendor {
+  createdAt: DateTime!
+  id: String!
+  name: String!
+  updatedAt: DateTime!
+  userId: String!
+}

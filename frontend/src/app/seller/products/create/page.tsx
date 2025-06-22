@@ -3,6 +3,16 @@
 import React, { useState } from "react";
 import { ChevronLeft, Upload, Plus, Trash, X } from "lucide-react";
 import Link from "next/link";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 const AddProductForm = () => {
   const [formData, setFormData] = useState({
@@ -33,6 +43,13 @@ const AddProductForm = () => {
     seoTitle: "",
     seoDescription: "",
   });
+
+  const [customConditions, setCustomConditions] = useState<string[]>([]);
+  const [customFeatures, setCustomFeatures] = useState<string[]>([]);
+  const [conditionDialogOpen, setConditionDialogOpen] = useState(false);
+  const [featureDialogOpen, setFeatureDialogOpen] = useState(false);
+  const [newCondition, setNewCondition] = useState("");
+  const [newFeature, setNewFeature] = useState("");
 
   const handleInputChange = (field: any, value: any) => {
     setFormData((prev) => ({
@@ -65,6 +82,37 @@ const AddProductForm = () => {
       ...prev,
       tags: prev.tags.filter((tag) => tag !== tagToRemove),
     }));
+  };
+
+  const handleAddCondition = () => {
+    if (newCondition && !customConditions.includes(newCondition)) {
+      setCustomConditions((prev) => [...prev, newCondition]);
+      setFormData((prev) => ({
+        ...prev,
+        condition: newCondition,
+      }));
+      setNewCondition("");
+      setConditionDialogOpen(false);
+    }
+  };
+
+  const handleAddFeature = () => {
+    if (
+      newFeature &&
+      !customFeatures.includes(newFeature) &&
+      !(newFeature in formData.features)
+    ) {
+      setCustomFeatures((prev) => [...prev, newFeature]);
+      setFormData((prev) => ({
+        ...prev,
+        features: {
+          ...prev.features,
+          [newFeature]: true,
+        },
+      }));
+      setNewFeature("");
+      setFeatureDialogOpen(false);
+    }
   };
 
   return (
@@ -315,6 +363,7 @@ const AddProductForm = () => {
                     "Good",
                     "Used",
                     "Defective",
+                    ...customConditions,
                   ].map((condition) => (
                     <label key={condition} className="flex items-center">
                       <input
@@ -333,13 +382,51 @@ const AddProductForm = () => {
                     </label>
                   ))}
                 </div>
-                <button
-                  type="button"
-                  className="mt-3 text-blue-600 text-sm font-medium flex items-center gap-1 hover:text-blue-700"
+                <Dialog
+                  open={conditionDialogOpen}
+                  onOpenChange={setConditionDialogOpen}
                 >
-                  <Plus className="w-4 h-4" />
-                  Add condition
-                </button>
+                  <DialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="mt-3 text-blue-600 text-sm font-medium flex items-center gap-1 hover:text-blue-700"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add condition
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add Condition</DialogTitle>
+                    </DialogHeader>
+                    <Input
+                      placeholder="Enter new condition"
+                      value={newCondition}
+                      onChange={(e) => setNewCondition(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddCondition();
+                      }}
+                      autoFocus
+                    />
+                    <DialogFooter>
+                      <button
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md"
+                        onClick={handleAddCondition}
+                        type="button"
+                      >
+                        Add
+                      </button>
+                      <DialogClose asChild>
+                        <button
+                          className="px-4 py-2 border rounded-md"
+                          type="button"
+                        >
+                          Cancel
+                        </button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
 
               {/* Features */}
@@ -366,13 +453,51 @@ const AddProductForm = () => {
                     )
                   )}
                 </div>
-                <button
-                  type="button"
-                  className="mt-3 text-blue-600 text-sm font-medium flex items-center gap-1 hover:text-blue-700"
+                <Dialog
+                  open={featureDialogOpen}
+                  onOpenChange={setFeatureDialogOpen}
                 >
-                  <Plus className="w-4 h-4" />
-                  Add another feature
-                </button>
+                  <DialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="mt-3 text-blue-600 text-sm font-medium flex items-center gap-1 hover:text-blue-700"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add another feature
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add Feature</DialogTitle>
+                    </DialogHeader>
+                    <Input
+                      placeholder="Enter new feature"
+                      value={newFeature}
+                      onChange={(e) => setNewFeature(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") handleAddFeature();
+                      }}
+                      autoFocus
+                    />
+                    <DialogFooter>
+                      <button
+                        className="px-4 py-2 bg-blue-600 text-white rounded-md"
+                        onClick={handleAddFeature}
+                        type="button"
+                      >
+                        Add
+                      </button>
+                      <DialogClose asChild>
+                        <button
+                          className="px-4 py-2 border rounded-md"
+                          type="button"
+                        >
+                          Cancel
+                        </button>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
 

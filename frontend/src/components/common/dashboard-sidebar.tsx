@@ -17,7 +17,7 @@ import { useState } from "react";
 // import { Button } from "../ui/button";
 
 export default function DashboardSidebar() {
-  const [userRole] = useState<any>(false);
+  const [userRole] = useState<any>("SELLER");
 
   const pathname = usePathname();
 
@@ -104,12 +104,11 @@ export default function DashboardSidebar() {
     },
   ];
 
-  const SidebarItem = ({ item, isActive, onClick }: any) => {
+  const SidebarItem = ({ item, isActive }: any) => {
     const IconComponent = item.icon;
     return (
       <Link href={item.link} className="w-full">
         <button
-          onClick={() => onClick(item.id)}
           className={`w-[92%] flex items-center gap-3 px-4 py-3 text-left transition-all duration-200 rounded-lg mx-2 cursor-pointer ${
             isActive
               ? "bg-red-50 text-red-600"
@@ -143,7 +142,7 @@ export default function DashboardSidebar() {
     <div className="bg-white border-r transition-all duration-300 flex flex-col pl-14 w-[360px] h-full sticky top-0">
       {/* Main Navigation */}
       <nav className="flex-1 py-4 space-y-1">
-        {(userRole === "seller" || userRole) &&
+        {(userRole === "SELLER" || userRole) &&
           sellerSidebarItems.map((item) => (
             <SidebarItem
               key={item.id}
@@ -152,7 +151,7 @@ export default function DashboardSidebar() {
             />
           ))}
 
-        {(userRole === "customer" || !userRole) &&
+        {(userRole === "CUSTOMER" || !userRole) &&
           customerSidebarItems.map((item) => (
             <SidebarItem
               key={item.id}

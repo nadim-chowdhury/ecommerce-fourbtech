@@ -3,37 +3,55 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@apollo/client";
+import { REGISTER_MUTATION_GQL } from "@/graphql/mutations";
+import { client } from "@/lib/apollo-client";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
+    role: "CUSTOMER",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
+  const [register] = useMutation(REGISTER_MUTATION_GQL, {
+    client: client,
+  });
 
-  const handleChange = (e: any) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      const { data } = await register({ variables: { input: formData } });
 
-    // Add your login logic here
-    console.log("Login data:", formData);
+      // Save token to localStorage
+      if (typeof window !== "undefined" && data?.register?.access_token) {
+        localStorage.setItem("token", data.register.access_token);
+        // Optionally, you can use data.register.user here if you want to store user info
+      }
 
-    setIsLoading(false);
-    router.push("/login"); // Redirect after successful login
+      router.push("/login");
+    } catch (err: any) {
+      setError(err.message || "Registration failed");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -47,14 +65,23 @@ export default function RegisterPage() {
           <div className="flex items-center justify-center space-x-2">
             <p className="text-slate-600">Register your account</p>
             <span>Or</span>
-            <Link href="/" className="text-blue-600">
+            <Link
+              href="/"
+              className="text-blue-600 hover:text-blue-800 transition-colors"
+            >
               Return home
             </Link>
           </div>
         </div>
 
-        {/* Login Form */}
+        {/* Registration Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Name Field */}
             <div className="space-y-2">
@@ -72,7 +99,7 @@ export default function RegisterPage() {
                 value={formData.name}
                 onChange={handleChange}
                 className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 focus:bg-white"
-                placeholder="Enter your email"
+                placeholder="Enter your full name"
               />
             </div>
 
@@ -159,33 +186,63 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
-                />
-                <span className="ml-2 text-sm text-slate-600">Remember me</span>
-              </label>
-              <span
-                // href="/forgot-password"
-                className="text-sm text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
+            {/* Role Select Field */}
+            <div className="space-y-2">
+              <label
+                htmlFor="role"
+                className="text-sm font-medium text-slate-700"
               >
-                Forgot password?
-              </span>
+                Register as
+              </label>
+              <select
+                id="role"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 focus:bg-white"
+              >
+                <option value="CUSTOMER">Customer</option>
+                <option value="SELLER">Seller</option>
+              </select>
+            </div>
+
+            {/* Terms and Privacy */}
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="terms"
+                required
+                className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
+              />
+              <label htmlFor="terms" className="ml-2 text-sm text-slate-600">
+                I agree to the{" "}
+                <Link
+                  href="/terms"
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link
+                  href="/privacy"
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  Privacy Policy
+                </Link>
+              </label>
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform active:scale-[0.98] disabled:transform-none cursor-pointer"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform disabled:transform-none disabled:opacity-70 cursor-pointer"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Signing in...
+                  Registering...
                 </div>
               ) : (
                 "Register"
@@ -193,14 +250,14 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          {/* Sign Up Link */}
+          {/* Sign In Link */}
           <div className="mt-6 text-center">
             <span className="text-slate-600">Already have an account? </span>
             <Link
               href="/login"
               className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
             >
-              Log in
+              Sign In
             </Link>
           </div>
         </div>

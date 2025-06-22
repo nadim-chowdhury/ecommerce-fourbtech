@@ -1,6 +1,7 @@
 import DashboardHeader from "@/components/common/dashboard-header";
 import DashboardNavbar from "@/components/common/dashboard-navbar";
 import DashboardSidebar from "@/components/common/dashboard-sidebar";
+import { ProtectedRoute } from "@/components/providers/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingCart } from "lucide-react";
 import Link from "next/link";
@@ -11,7 +12,7 @@ export default function SellerLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <ProtectedRoute allowedRoles={["CUSTOMER"]}>
       <DashboardHeader />
 
       <div className="flex items-center gap-4">
@@ -40,6 +41,6 @@ export default function SellerLayout({
         <DashboardSidebar />
         <div className="bg-neutral-100 w-full">{children}</div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }
