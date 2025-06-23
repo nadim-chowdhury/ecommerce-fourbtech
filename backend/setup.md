@@ -1,4 +1,4 @@
-# FourBtech eCommerce Backend Setup
+# eCommerce Backend Setup
 
 ## Prerequisites
 

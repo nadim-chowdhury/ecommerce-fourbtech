@@ -41,9 +41,8 @@ export default function RegisterPage() {
       const { data } = await register({ variables: { input: formData } });
 
       // Save token to localStorage
-      if (typeof window !== "undefined" && data?.register?.access_token) {
-        localStorage.setItem("token", data.register.access_token);
-        // Optionally, you can use data.register.user here if you want to store user info
+      if (typeof window !== "undefined" && data?.register) {
+        localStorage.setItem("token", data.register);
       }
 
       router.push("/login");
@@ -186,7 +185,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Role Select Field */}
+            {/* Role Field */}
             <div className="space-y-2">
               <label
                 htmlFor="role"
@@ -199,7 +198,6 @@ export default function RegisterPage() {
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                required
                 className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 focus:bg-white"
               >
                 <option value="CUSTOMER">Customer</option>
@@ -237,7 +235,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform disabled:transform-none disabled:opacity-70 cursor-pointer"
+              className="w-full bg-red-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:transform-none disabled:opacity-70 cursor-pointer"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
