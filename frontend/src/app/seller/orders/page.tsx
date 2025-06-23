@@ -92,7 +92,6 @@ const OrdersDashboard = () => {
   const handleShipOrder = (order: any) => {
     setSelectedOrder(order);
     setIsDialogOpen(true);
-    console.log("Shipping order:", order);
   };
 
   const handleTabChange = (value: any) => {

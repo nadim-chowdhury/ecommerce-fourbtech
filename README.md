@@ -163,7 +163,7 @@ Create a `.env` file in the backend directory:
 
 ```env
 # Database
-DATABASE_URL="postgresql://username:password@localhost:5432/fourbtech_ecommerce?schema=public"
+DATABASE_URL="postgresql://username:password@localhost:5432/db?schema=public"
 
 # JWT
 JWT_SECRET="your-super-secret-jwt-key"

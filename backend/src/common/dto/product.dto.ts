@@ -79,8 +79,8 @@ export class Product {
   @Field(() => [String], { nullable: true })
   tags?: string[];
 
-  @Field({ nullable: true })
-  features?: any;
+  @Field(() => String, { nullable: true })
+  features?: string;
 
   @Field()
   createdAt: Date;
@@ -215,9 +215,9 @@ export class CreateProductInput {
   @IsOptional()
   tags?: string[];
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsOptional()
-  features?: any;
+  features?: string;
 }
 
 @InputType()
@@ -328,7 +328,7 @@ export class UpdateProductInput {
   @IsOptional()
   tags?: string[];
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @IsOptional()
-  features?: any;
+  features?: string;
 }

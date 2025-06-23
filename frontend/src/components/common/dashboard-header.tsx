@@ -14,17 +14,12 @@ import {
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useState } from "react";
+import { useAuth, useSignOut } from "../providers/auth-provider";
 
 const LANGUAGES = [
   { code: "EN", label: "English" },
   { code: "ES", label: "Español" },
   { code: "DE", label: "Deutsch" },
-];
-
-const USER_MENU_ITEMS = [
-  { label: "Profile", action: () => {} },
-  { label: "Settings", action: () => {} },
-  { label: "Sign Out", action: () => {} },
 ];
 
 const DEMO_NOTIFICATIONS = [
@@ -65,6 +60,20 @@ const DEMO_NOTIFICATIONS = [
 export default function DashboardHeader() {
   const [notifications, setNotifications] = useState(DEMO_NOTIFICATIONS);
   const unreadCount = notifications.filter((n) => n.unread).length;
+
+  const { user } = useAuth();
+  const signOut = useSignOut();
+
+  const USER_MENU_ITEMS = [
+    { label: "Profile", action: () => {} },
+    { label: "Settings", action: () => {} },
+    {
+      label: "Sign Out",
+      action: () => {
+        signOut();
+      },
+    },
+  ];
 
   const markAsRead = (id: any) => {
     setNotifications((prev) =>
@@ -267,7 +276,7 @@ export default function DashboardHeader() {
               <div className="rounded-full bg-neutral-100 p-2">
                 <User className="w-4 h-4" />
               </div>
-              <span className="font-medium">Nadim Chowdhury</span>
+              <span className="font-medium">{user?.name}</span>
               <ChevronDown className="w-4 h-4" />
             </Button>
           </PopoverTrigger>

@@ -19,6 +19,10 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import VendorModal from "@/components/seller-products/vendor-modal";
+import { useAuth } from "@/components/providers/auth-provider";
+import { useQuery } from "@apollo/client";
+import { MY_VENDOR_QUERY_GQL } from "@/graphql/queries";
 
 const SellerOverview = () => {
   // Demo data for the revenue chart (30 days)
@@ -55,6 +59,11 @@ const SellerOverview = () => {
     { date: "Jun 12", revenue: 2450 },
   ];
 
+  const { user } = useAuth();
+  const { data } = useQuery(MY_VENDOR_QUERY_GQL);
+  const vendorName = data?.me?.vendor?.name;
+  const hasVendor = !!vendorName;
+
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -73,14 +82,28 @@ const SellerOverview = () => {
     <div className="min-h-screen w-full bg-gray-50 p-6 pr-16">
       <div className="space-y-8">
         {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Welcome back, Nadim Chowdhury!
-          </h1>
-          <p className="text-lg text-gray-600">
-            You&apos;ve made{" "}
-            <span className="font-semibold text-gray-900">$2,450</span> today.
-          </p>
+        <div className="space-y-2 flex items-center justify-between">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-3xl font-bold text-gray-900">
+              Welcome back, {user?.name}!
+            </h1>
+            <p className="text-lg text-gray-600">
+              You&apos;ve made{" "}
+              <span className="font-semibold text-gray-900">$2,450</span> today.
+            </p>
+            {hasVendor && (
+              <span className="inline-block mt-1 text-sm text-gray-700 bg-gray-100 px-3 py-1 rounded-full font-medium">
+                Vendor: {vendorName}
+              </span>
+            )}
+          </div>
+          <VendorModal
+            trigger={
+              <Button variant="outline">
+                {hasVendor ? "Edit Vendor Profile" : "Create Vendor Profile"}
+              </Button>
+            }
+          />
         </div>
 
         {/* Sales Metrics */}

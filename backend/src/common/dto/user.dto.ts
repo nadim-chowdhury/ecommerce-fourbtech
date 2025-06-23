@@ -70,3 +70,18 @@ export class UpdateVendorInput {
   name?: string;
   // Add more fields as needed (e.g., description, logo)
 }
+
+@InputType()
+export class CreateVendorInput {
+  @Field()
+  @IsString()
+  name: string;
+}
+
+@InputType()
+export class DeleteVendorInput {
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  id?: string;
+}

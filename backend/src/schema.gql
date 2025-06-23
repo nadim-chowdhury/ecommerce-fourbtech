@@ -17,13 +17,33 @@ input CreateOrderItemInput {
 }
 
 input CreateProductInput {
+  brand: String
+  category: String
+  color: String
+  color2: String
+  condition: String
   description: String!
+  enableNegotiation: Boolean
+  features: String
   imageUrl: String
   isActive: Boolean
+  model: String
   name: String!
   price: Float!
+  ram: String
+  ram2: String
+  salePrice: Float
+  seoDescription: String
+  seoTitle: String
+  sku: String
   stock: Float!
+  storage: String
+  tags: [String!]
   vendorId: String!
+}
+
+input CreateVendorInput {
+  name: String!
 }
 
 """
@@ -39,6 +59,8 @@ input LoginInput {
 type Mutation {
   createOrder(input: CreateOrderInput!): Order!
   createProduct(input: CreateProductInput!): Product!
+  createVendor(input: CreateVendorInput!): Vendor!
+  deleteVendor: Vendor!
   login(input: LoginInput!): AuthResponse!
   register(input: RegisterInput!): AuthResponse!
   removeProduct(id: String!): Product!
@@ -74,14 +96,30 @@ type OrderStats {
 }
 
 type Product {
+  brand: String
+  category: String
+  color: String
+  color2: String
+  condition: String
   createdAt: DateTime!
   description: String!
+  enableNegotiation: Boolean
+  features: String
   id: String!
   imageUrl: String
   isActive: Boolean!
+  model: String
   name: String!
   price: Float!
+  ram: String
+  ram2: String
+  salePrice: Float
+  seoDescription: String
+  seoTitle: String
+  sku: String
   stock: Float!
+  storage: String
+  tags: [String!]
   updatedAt: DateTime!
   vendorId: String!
 }
@@ -96,6 +134,7 @@ type Query {
   products: [Product!]!
   profile: User!
   searchProducts(query: String!): [Product!]!
+  vendor: Vendor!
   vendorOrders(vendorId: String!): [Order!]!
   vendorProducts(vendorId: String!): [Product!]!
 }
@@ -112,12 +151,28 @@ input UpdateOrderStatusInput {
 }
 
 input UpdateProductInput {
+  brand: String
+  category: String
+  color: String
+  color2: String
+  condition: String
   description: String
+  enableNegotiation: Boolean
+  features: String
   imageUrl: String
   isActive: Boolean
+  model: String
   name: String
   price: Float
+  ram: String
+  ram2: String
+  salePrice: Float
+  seoDescription: String
+  seoTitle: String
+  sku: String
   stock: Float
+  storage: String
+  tags: [String!]
 }
 
 input UpdateVendorInput {

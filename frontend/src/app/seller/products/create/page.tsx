@@ -13,6 +13,10 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useMutation } from "@apollo/client";
+import { CREATE_PRODUCT_MUTATION_GQL } from "@/graphql/mutations";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/providers/auth-provider";
 
 const AddProductForm = () => {
   const [formData, setFormData] = useState({
@@ -50,6 +54,11 @@ const AddProductForm = () => {
   const [featureDialogOpen, setFeatureDialogOpen] = useState(false);
   const [newCondition, setNewCondition] = useState("");
   const [newFeature, setNewFeature] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { user } = useAuth();
+  const [createProduct] = useMutation(CREATE_PRODUCT_MUTATION_GQL);
 
   const handleInputChange = (field: any, value: any) => {
     setFormData((prev) => ({
@@ -115,6 +124,53 @@ const AddProductForm = () => {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+    try {
+      if (!user?.vendorId) throw new Error("Vendor ID not found");
+      // Prepare features as a string (JSON)
+      const featuresString = JSON.stringify(
+        Object.entries(formData.features)
+          .filter(([, checked]) => checked)
+          .map(([feature]) => feature)
+      );
+      const input = {
+        name: formData.title,
+        description: formData.description,
+        category: formData.category,
+        brand: formData.brand,
+        model: formData.model,
+        storage: formData.storage,
+        ram: formData.ram,
+        color: formData.color,
+        ram2: formData.ram2,
+        color2: formData.color2,
+        condition: formData.condition,
+        features: featuresString,
+        price: Number(formData.price),
+        salePrice: formData.salePrice ? Number(formData.salePrice) : undefined,
+        stock: Number(formData.quantity),
+        sku: formData.sku,
+        enableNegotiation: formData.enableNegotiation,
+        tags: formData.tags,
+        seoTitle: formData.seoTitle,
+        seoDescription: formData.seoDescription,
+        vendorId: user.vendorId,
+        isActive: true,
+        imageUrl: null, // TODO: handle image upload
+      };
+      console.log(" handleSubmit ~ input:", input);
+      await createProduct({ variables: { input } });
+      router.push("/seller/products");
+    } catch (err: any) {
+      setError(err.message || "Failed to create product");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen pl-6 py-6 pr-16">
       <div className="">
@@ -136,7 +192,7 @@ const AddProductForm = () => {
           </div>
         </div>
 
-        <div className="">
+        <form onSubmit={handleSubmit}>
           <div className="space-y-8">
             {/* General Information */}
             <div className="bg-white rounded-md border p-6">
@@ -665,7 +721,6 @@ const AddProductForm = () => {
               >
                 <Trash className="w-4 h-4" /> Discard
               </button>
-
               <div className="flex items-center gap-3">
                 <button
                   type="button"
@@ -676,13 +731,15 @@ const AddProductForm = () => {
                 <button
                   type="submit"
                   className="px-6 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  disabled={isLoading}
                 >
-                  Send for Review
+                  {isLoading ? "Submitting..." : "Send for Review"}
                 </button>
               </div>
             </div>
+            {error && <div className="text-red-600 mt-4">{error}</div>}
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { ShoppingCart, User, Menu, X, Search, Heart } from "lucide-react";
+import {
+  ShoppingCart,
+  User,
+  Menu,
+  X,
+  Search,
+  Heart,
+  LayoutDashboard,
+} from "lucide-react";
 import { useAuth } from "../providers/auth-provider";
 import { Button } from "../ui/button";
 import { useSelector } from "react-redux";
@@ -79,7 +87,6 @@ export default function MainHeader() {
   const wishlistCount = useSelector(
     (state: RootState) => state.wishlist.items.length
   );
-  console.log(" MainHeader ~ user:", user);
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b shadow-sm">
@@ -156,9 +163,9 @@ export default function MainHeader() {
         </div>
 
         {/* Icons */}
-        <div className="flex items-center gap-2">
-          {isAuthenticated ? (
-            <>
+        {isAuthenticated && user.role === "CUSTOMER" && (
+          <div className="flex items-center gap-2">
+            <div>
               <Link href="/customer/cart" className="relative group">
                 <Button variant={"outline"}>
                   <ShoppingCart className="w-6 h-6 text-gray-700 group-hover:text-red-600 transition" />
@@ -185,39 +192,55 @@ export default function MainHeader() {
                   </span>
                 )}
               </Link>
-              <Link href={`/${user?.role}/profile`}>
+              <Link href={`/${user?.role.toLowerCase()}/profile`}>
                 <Button variant={"outline"}>
                   <User className="w-6 h-6 text-gray-700 hover:text-red-600 transition" />
                 </Button>
               </Link>
-            </>
+            </div>
+          </div>
+        )}
+
+        {!isAuthenticated && (
+          <>
+            <Link href="/login">
+              <button className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 font-medium transition">
+                Login
+              </button>
+            </Link>
+            <Link href="/register">
+              <button className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 font-medium transition">
+                Register
+              </button>
+            </Link>
+          </>
+        )}
+
+        {isAuthenticated && user.role === "SELLER" && (
+          <>
+            <Link href={`/${user.role.toLowerCase()}/overview`}>
+              <Button
+                className="h-10 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 font-medium transition"
+                variant={`ghost`}
+              >
+                <LayoutDashboard className="w-4 h-4" />
+              </Button>
+            </Link>
+          </>
+        )}
+
+        {/* Mobile menu button */}
+        <button
+          className="md:hidden ml-2"
+          onClick={() => setMobileMenuOpen((v) => !v)}
+          aria-label="Open menu"
+        >
+          {mobileMenuOpen ? (
+            <X className="w-7 h-7" />
           ) : (
-            <>
-              <Link href="/login">
-                <button className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 font-medium transition">
-                  Login
-                </button>
-              </Link>
-              <Link href="/register">
-                <button className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 font-medium transition">
-                  Register
-                </button>
-              </Link>
-            </>
+            <Menu className="w-7 h-7" />
           )}
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden ml-2"
-            onClick={() => setMobileMenuOpen((v) => !v)}
-            aria-label="Open menu"
-          >
-            {mobileMenuOpen ? (
-              <X className="w-7 h-7" />
-            ) : (
-              <Menu className="w-7 h-7" />
-            )}
-          </button>
-        </div>
+        </button>
       </div>
 
       {/* Mobile Nav */}

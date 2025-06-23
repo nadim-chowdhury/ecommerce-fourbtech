@@ -35,7 +35,6 @@ export default function AuthProvider({
 
 export function useAuth() {
   const user = useSelector((state: RootState) => state.user.user);
-  console.log(" useAuth ~ user:", user);
   return {
     user,
     isAuthenticated: !!user,
@@ -72,4 +71,23 @@ export function ProtectedRoute({
   if (!isAuthenticated) return null;
   if (allowedRoles && user && !allowedRoles.includes(user.role)) return null;
   return <>{children}</>;
+}
+
+export function useSignOut() {
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  return () => {
+    // Remove user from Redux
+    dispatch(clearUser());
+    // Remove user from localStorage
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("user");
+      // Remove token from cookies
+      document.cookie =
+        "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    }
+    // Redirect to login or home
+    router.push("/login");
+  };
 }
