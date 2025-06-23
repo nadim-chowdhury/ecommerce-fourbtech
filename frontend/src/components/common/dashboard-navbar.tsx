@@ -206,7 +206,7 @@ export default function DashboardNavbar({ className }: any) {
 
   return (
     <div
-      className={`${className} py-4 border-b flex items-center justify-between gap-6`}
+      className={`${className} py-4 border-b flex items-center justify-between gap-6 bg-white`}
     >
       <div className="w-full flex items-center bg-white border rounded-md overflow-hidden">
         {/* Categories Dropdown */}

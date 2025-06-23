@@ -34,7 +34,9 @@ export default function AuthProvider({
 }
 
 export function useAuth() {
-  const user = useSelector((state: RootState) => state.user.user);
+  const user =
+    useSelector((state: RootState) => state.user.user) ||
+    JSON.parse(localStorage.getItem("user") || "null");
   return {
     user,
     isAuthenticated: !!user,
@@ -62,7 +64,7 @@ export function ProtectedRoute({
         router.replace("/login");
       } else if (allowedRoles && user && !allowedRoles.includes(user.role)) {
         // Redirect to a not-authorized page or home
-        router.replace(`/${user.role.toLowerCase()}/overview`);
+        router.replace(`/${user?.role?.toLowerCase()}/overview`);
       }
     }
   }, [hydrated, isAuthenticated, allowedRoles, user, router]);
@@ -70,7 +72,7 @@ export function ProtectedRoute({
   if (!hydrated) return null;
   if (!isAuthenticated) return null;
   if (allowedRoles && user && !allowedRoles.includes(user.role)) return null;
-  return <>{children}</>;
+  return <div className="">{children}</div>;
 }
 
 export function useSignOut() {

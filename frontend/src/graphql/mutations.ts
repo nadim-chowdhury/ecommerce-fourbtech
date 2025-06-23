@@ -41,28 +41,42 @@ export const CREATE_PRODUCT_MUTATION_GQL = gql`
       name
       description
       price
-      salePrice
-      imageUrl
-      vendorId
       stock
-      isActive
       category
       brand
       model
-      storage
-      ram
-      color
-      ram2
-      color2
-      condition
       sku
-      seoTitle
-      seoDescription
-      enableNegotiation
-      tags
-      features
+      isActive
       createdAt
       updatedAt
+    }
+  }
+`;
+
+export const UPDATE_PRODUCT_MUTATION_GQL = gql`
+  mutation UpdateProduct($id: String!, $input: UpdateProductInput!) {
+    updateProduct(id: $id, input: $input) {
+      id
+      name
+      description
+      price
+      stock
+      category
+      brand
+      model
+      sku
+      isActive
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_PRODUCT_MUTATION_GQL = gql`
+  mutation DeleteProduct($id: String!) {
+    removeProduct(id: $id) {
+      id
+      name
     }
   }
 `;

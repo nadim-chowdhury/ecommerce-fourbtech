@@ -14,127 +14,21 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import Link from "next/link";
 import { TablePagination } from "@/components/common/table-pagination";
 import ProductsTable from "@/components/seller-products/products-table";
-
-// Mock data - expanded for pagination demo
-const initialProducts = [
-  {
-    id: 1,
-    name: "Premium Cotton T-Shirt",
-    sku: "TS-001",
-    price: 100,
-    stock: 200,
-    status: "Active",
-    category: "Men's Clothing",
-  },
-  {
-    id: 2,
-    name: "Leather Wallet",
-    sku: "WL-002",
-    price: 50,
-    stock: 200,
-    status: "Active",
-    category: "Wearables",
-  },
-  {
-    id: 3,
-    name: "Wireless Earbuds",
-    sku: "EB-003",
-    price: 70,
-    stock: 12,
-    status: "Low Stock",
-    category: "Headphones & Audio",
-  },
-  {
-    id: 4,
-    name: "Handcrafted Ceramic Mug",
-    sku: "MG-004",
-    price: 60,
-    stock: 32,
-    status: "Active",
-    category: "Kitchen & Dining",
-  },
-  {
-    id: 5,
-    name: "Organic Face Cream",
-    sku: "MG-004",
-    price: 200,
-    stock: 0,
-    status: "Out of Stock",
-    category: "Skincare",
-  },
-  {
-    id: 6,
-    name: "Bamboo Cutting Board",
-    sku: "CB-006",
-    price: 620,
-    stock: 5,
-    status: "Low Stock",
-    category: "Kitchen & Dining",
-  },
-  {
-    id: 7,
-    name: "Smart Watch",
-    sku: "SW-007",
-    price: 299,
-    stock: 15,
-    status: "Active",
-    category: "Wearables",
-  },
-  {
-    id: 8,
-    name: "Gaming Mouse",
-    sku: "GM-008",
-    price: 45,
-    stock: 25,
-    status: "Active",
-    category: "Laptops & Accessories",
-  },
-  {
-    id: 9,
-    name: "Wireless Keyboard",
-    sku: "WK-009",
-    price: 89,
-    stock: 8,
-    status: "Low Stock",
-    category: "Laptops & Accessories",
-  },
-  {
-    id: 10,
-    name: "Phone Case",
-    sku: "PC-010",
-    price: 25,
-    stock: 0,
-    status: "Out of Stock",
-    category: "Mobile",
-  },
-  {
-    id: 11,
-    name: "Bluetooth Speaker",
-    sku: "BS-011",
-    price: 120,
-    stock: 18,
-    status: "Active",
-    category: "Headphones & Audio",
-  },
-  {
-    id: 12,
-    name: "Coffee Maker",
-    sku: "CM-012",
-    price: 150,
-    stock: 10,
-    status: "Active",
-    category: "Kitchen & Dining",
-  },
-];
+import { useQuery, useMutation } from "@apollo/client";
+import { VENDOR_PRODUCTS_QUERY_GQL } from "@/graphql/queries";
+import { DELETE_PRODUCT_MUTATION_GQL } from "@/graphql/mutations";
+import { toast } from "sonner";
+import { useAuth } from "@/components/providers/auth-provider";
 
 const categories = [
   "All Categories",
-  "Mobile",
-  "Laptops & Accessories",
+  "Mobile Phones",
+  "Laptops",
+  "Tablets",
   "Wearables",
   "Headphones & Audio",
   "Kitchen & Dining",
@@ -147,7 +41,7 @@ const categories = [
 const stockStatuses = ["All", "Active", "Low stock", "Out of stock"];
 
 const ProductsPage = () => {
-  const [products, setProducts] = useState(initialProducts);
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedStatus, setSelectedStatus] = useState("All");
@@ -160,20 +54,95 @@ const ProductsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const handleDeleteConfirm = () => {
-    if (productToDelete) {
-      setProducts(
-        products.filter((product) => product.id !== productToDelete.id)
-      );
-      setProductToDelete(null);
+  // Get vendorId from user or localStorage
+  const getVendorId = () => {
+    if (user?.vendorId) return user.vendorId;
+
+    if (typeof window !== "undefined") {
+      const vendorStr = localStorage.getItem("vendor");
+      if (vendorStr) {
+        try {
+          const vendorObj = JSON.parse(vendorStr);
+          return (
+            vendorObj.vendorId || vendorObj.id || vendorObj.vendor?.id || null
+          );
+        } catch {
+          return null;
+        }
+      }
     }
-    setDeleteDialogOpen(false);
+    return null;
   };
 
-  const filteredProducts = products.filter((product) => {
+  const vendorId = getVendorId();
+
+  // Fetch products from backend
+  const { data, loading, error, refetch } = useQuery(
+    VENDOR_PRODUCTS_QUERY_GQL,
+    {
+      variables: { vendorId },
+      skip: !vendorId,
+    }
+  );
+
+  // Delete product mutation
+  const [deleteProduct, { loading: deleting }] = useMutation(
+    DELETE_PRODUCT_MUTATION_GQL,
+    {
+      onCompleted: () => {
+        toast.success("Product deleted successfully");
+        refetch(); // Refetch the products list
+      },
+      onError: (error) => {
+        toast.error(error.message || "Failed to delete product");
+      },
+    }
+  );
+
+  useEffect(() => {
+    if (error) {
+      toast.error("Failed to load products");
+    }
+  }, [error]);
+
+  const handleDeleteConfirm = async () => {
+    if (productToDelete) {
+      try {
+        await deleteProduct({
+          variables: { id: productToDelete.id },
+        });
+        setProductToDelete(null);
+        setDeleteDialogOpen(false);
+      } catch {
+        // Error is handled by onError callback
+      }
+    }
+  };
+
+  const handleDeleteClick = (product: any) => {
+    setProductToDelete(product);
+    setDeleteDialogOpen(true);
+  };
+
+  // Use backend data if available, else fallback to empty array
+  const products = data?.vendorProducts || [];
+
+  // Transform products to include status based on stock
+  const transformedProducts = products.map((product: any) => ({
+    ...product,
+    status:
+      product.stock === 0
+        ? "Out of Stock"
+        : product.stock <= 10
+        ? "Low Stock"
+        : "Active",
+  }));
+
+  const filteredProducts = transformedProducts.filter((product: any) => {
     const matchesSearch =
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.sku.toLowerCase().includes(searchTerm.toLowerCase());
+      (product.sku &&
+        product.sku.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory =
       selectedCategory === "All Categories" ||
       product.category === selectedCategory;
@@ -202,8 +171,60 @@ const ProductsPage = () => {
     setCurrentPage(page);
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="pl-6 py-6 pr-16 bg-gray-50 min-h-screen">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-semibold text-gray-900">Products</h1>
+          <Link href={"/seller/products/create"} className="no-underline">
+            <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors">
+              <Plus className="w-4 h-4" />
+              Add Product
+            </button>
+          </Link>
+        </div>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto mb-4"></div>
+            <p className="text-gray-500">Loading products...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="pl-6 py-6 pr-16 bg-gray-50 min-h-screen">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-semibold text-gray-900">Products</h1>
+          <Link href={"/seller/products/create"} className="no-underline">
+            <button className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors">
+              <Plus className="w-4 h-4" />
+              Add Product
+            </button>
+          </Link>
+        </div>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <p className="text-gray-500">Failed to load products</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-2 text-red-600 hover:text-red-700"
+            >
+              Try again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="pl-6 py-6 pr-16 bg-gray-50 min-h-screen">
+    <div className="pl-6 py-6 pr-16 w-full bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">Products</h1>
@@ -297,8 +318,7 @@ const ProductsPage = () => {
       {/* Table */}
       <ProductsTable
         currentProducts={currentProducts}
-        setProductToDelete={setProductToDelete}
-        setDeleteDialogOpen={setDeleteDialogOpen}
+        onDeleteClick={handleDeleteClick}
       />
 
       {/* Pagination */}
@@ -312,7 +332,6 @@ const ProductsPage = () => {
 
       {/* Delete Confirmation Modal */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogTrigger></DialogTrigger>
         <DialogContent className="w-96">
           <div className="">
             <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
@@ -336,22 +355,36 @@ const ProductsPage = () => {
                 <p className="text-lg font-semibold text-gray-900">
                   {productToDelete.name}
                 </p>
+                <p className="text-sm text-gray-500">
+                  SKU: {productToDelete.sku || "N/A"}
+                </p>
               </div>
             )}
 
             <div className="flex justify-center items-center gap-3">
               <button
                 onClick={() => setDeleteDialogOpen(false)}
-                className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                disabled={deleting}
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
                 <X className="w-5 h-5" /> Cancel
               </button>
               <button
                 onClick={handleDeleteConfirm}
-                className="flex items-center gap-2 px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors"
+                disabled={deleting}
+                className="flex items-center gap-2 px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors disabled:opacity-50"
               >
-                <Trash className="w-4 h-4" />
-                Delete
+                {deleting ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash className="w-4 h-4" />
+                    Delete
+                  </>
+                )}
               </button>
             </div>
           </div>

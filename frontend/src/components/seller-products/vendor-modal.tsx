@@ -20,7 +20,11 @@ import { MY_VENDOR_QUERY_GQL } from "@/graphql/queries";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/slices/userSlice";
 
-export default function VendorModal({ trigger }: { trigger: React.ReactNode }) {
+export default function VendorModal({
+  trigger,
+  isModalOpen,
+  setIsModalOpen,
+}: any) {
   const dispatch = useDispatch();
   const { data, loading, refetch } = useQuery(MY_VENDOR_QUERY_GQL);
   const [updateVendor, { loading: updating }] = useMutation(
@@ -35,6 +39,7 @@ export default function VendorModal({ trigger }: { trigger: React.ReactNode }) {
 
   const hasVendor = !!data?.vendor;
   const vendorName = data?.vendor?.name;
+  console.log(" VendorModal ~ vendorName:", vendorName);
 
   React.useEffect(() => {
     if (data?.vendor?.name) setName(data.vendor.name);
@@ -48,17 +53,22 @@ export default function VendorModal({ trigger }: { trigger: React.ReactNode }) {
       await refetch();
       // Update Redux and localStorage user
       if (data?.vendor) {
-        const updatedUser = {
+        const updatedVendor = {
           ...data.vendor,
           vendorId: res.data.updateVendor.id,
           vendor: res.data.updateVendor,
         };
-        dispatch(setUser(updatedUser));
+        // dispatch(setUser(updatedVendor));
         if (typeof window !== "undefined") {
-          localStorage.setItem("user", JSON.stringify(updatedUser));
+          localStorage.setItem("vendor", JSON.stringify(updatedVendor));
         }
       }
       setSuccess(true);
+      // Close modal after successful update
+      setTimeout(() => {
+        setIsModalOpen(false);
+        setSuccess(false);
+      }, 1000); // Close after 1.5 seconds to show success message
     } catch (err: any) {
       setError(err.message || "Failed to update vendor");
     }
@@ -72,24 +82,38 @@ export default function VendorModal({ trigger }: { trigger: React.ReactNode }) {
       await refetch();
       // Update Redux and localStorage user
       if (data?.vendor) {
-        const updatedUser = {
+        const updatedVendor = {
           ...data.vendor,
           vendorId: res.data.createVendor.id,
           vendor: res.data.createVendor,
         };
-        dispatch(setUser(updatedUser));
+        dispatch(setUser(updatedVendor));
         if (typeof window !== "undefined") {
-          localStorage.setItem("user", JSON.stringify(updatedUser));
+          localStorage.setItem("vendor", JSON.stringify(updatedVendor));
         }
       }
       setSuccess(true);
+      // Close modal after successful creation
+      setTimeout(() => {
+        setIsModalOpen(false);
+        setSuccess(false);
+      }, 1000); // Close after 1.5 seconds to show success message
     } catch (err: any) {
       setError(err.message || "Failed to create vendor");
     }
   };
 
+  const handleOpenChange = (open: boolean) => {
+    setIsModalOpen(open);
+    if (!open) {
+      // Reset form when modal closes
+      setError(null);
+      setSuccess(false);
+    }
+  };
+
   return (
-    <Dialog>
+    <Dialog open={isModalOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent>
         <DialogHeader>

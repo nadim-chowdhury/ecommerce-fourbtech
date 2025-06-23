@@ -23,6 +23,7 @@ import VendorModal from "@/components/seller-products/vendor-modal";
 import { useAuth } from "@/components/providers/auth-provider";
 import { useQuery } from "@apollo/client";
 import { MY_VENDOR_QUERY_GQL } from "@/graphql/queries";
+import { useState } from "react";
 
 const SellerOverview = () => {
   // Demo data for the revenue chart (30 days)
@@ -59,9 +60,11 @@ const SellerOverview = () => {
     { date: "Jun 12", revenue: 2450 },
   ];
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { user } = useAuth();
   const { data } = useQuery(MY_VENDOR_QUERY_GQL);
-  const vendorName = data?.me?.vendor?.name;
+  const vendorName = data?.vendor?.name;
   const hasVendor = !!vendorName;
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -79,11 +82,11 @@ const SellerOverview = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 p-6 pr-16">
+    <div className="min-h-screen w-full p-6 pr-16">
       <div className="space-y-8">
         {/* Header */}
-        <div className="space-y-2 flex items-center justify-between">
-          <div className="flex flex-col gap-1">
+        <div className="flex items-center justify-between gap-1">
+          <div>
             <h1 className="text-3xl font-bold text-gray-900">
               Welcome back, {user?.name}!
             </h1>
@@ -91,19 +94,24 @@ const SellerOverview = () => {
               You&apos;ve made{" "}
               <span className="font-semibold text-gray-900">$2,450</span> today.
             </p>
+          </div>
+          <div className="flex items-baseline gap-4">
             {hasVendor && (
-              <span className="inline-block mt-1 text-sm text-gray-700 bg-gray-100 px-3 py-1 rounded-full font-medium">
+              <span className="inline-block mt-1 text-gray-700 bg-white px-3 py-1 rounded-full font-medium border">
                 Vendor: {vendorName}
               </span>
             )}
+
+            <VendorModal
+              trigger={
+                <Button variant="outline">
+                  {hasVendor ? "Edit Vendor Profile" : "Create Vendor Profile"}
+                </Button>
+              }
+              isModalOpen={isModalOpen}
+              setIsModalOpen={setIsModalOpen}
+            />
           </div>
-          <VendorModal
-            trigger={
-              <Button variant="outline">
-                {hasVendor ? "Edit Vendor Profile" : "Create Vendor Profile"}
-              </Button>
-            }
-          />
         </div>
 
         {/* Sales Metrics */}

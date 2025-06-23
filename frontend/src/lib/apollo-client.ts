@@ -9,16 +9,13 @@ function getCookie(name: string) {
   if (typeof document === "undefined") return null;
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) {
-    const part = parts.pop();
-    if (part) return part.split(";").shift() || null;
-  }
+  if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
   return null;
 }
 
 const authLink = setContext((_, { headers }) => {
-  // get the authentication token from cookies if it exists
-  const token = typeof window !== "undefined" ? getCookie("token") : null;
+  const token = getCookie("token");
+
   return {
     headers: {
       ...headers,

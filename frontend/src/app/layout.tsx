@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ClientRootProvider from "@/components/providers/client-root-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,8 +23,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`}>
-        <ClientRootProvider>{children} </ClientRootProvider>
+      <body className={`${inter.className} antialiased bg-neutral-100`}>
+        <ClientRootProvider>
+          {children}
+          <Toaster />
+        </ClientRootProvider>
       </body>
     </html>
   );

@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { useMutation } from "@apollo/client";
 import { CREATE_PRODUCT_MUTATION_GQL } from "@/graphql/mutations";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/components/providers/auth-provider";
+import { toast } from "sonner";
 
 const AddProductForm = () => {
   const [formData, setFormData] = useState({
@@ -55,9 +55,9 @@ const AddProductForm = () => {
   const [newCondition, setNewCondition] = useState("");
   const [newFeature, setNewFeature] = useState("");
   const [error, setError] = useState<string | null>(null);
+  console.log(" AddProductForm ~ error:", error);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { user } = useAuth();
   const [createProduct] = useMutation(CREATE_PRODUCT_MUTATION_GQL);
 
   const handleInputChange = (field: any, value: any) => {
@@ -128,8 +128,24 @@ const AddProductForm = () => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
+
+    let vendorId = null;
+    if (typeof window !== "undefined") {
+      const vendorStr = localStorage.getItem("vendor");
+      if (vendorStr) {
+        try {
+          const vendorObj = JSON.parse(vendorStr);
+          // Try to get vendorId from the top level, or from vendor.vendor
+          vendorId =
+            vendorObj.vendorId || vendorObj.id || vendorObj.vendor?.id || null;
+        } catch {
+          vendorId = null;
+        }
+      }
+    }
+
     try {
-      if (!user?.vendorId) throw new Error("Vendor ID not found");
+      if (!vendorId) throw new Error("Vendor ID not found");
       // Prepare features as a string (JSON)
       const featuresString = JSON.stringify(
         Object.entries(formData.features)
@@ -157,15 +173,16 @@ const AddProductForm = () => {
         tags: formData.tags,
         seoTitle: formData.seoTitle,
         seoDescription: formData.seoDescription,
-        vendorId: user.vendorId,
+        vendorId: vendorId,
         isActive: true,
         imageUrl: null, // TODO: handle image upload
       };
       console.log(" handleSubmit ~ input:", input);
       await createProduct({ variables: { input } });
+      toast.success("Product created successfully!");
       router.push("/seller/products");
     } catch (err: any) {
-      setError(err.message || "Failed to create product");
+      toast.error(err.message || "Failed to create product");
     } finally {
       setIsLoading(false);
     }
@@ -737,7 +754,6 @@ const AddProductForm = () => {
                 </button>
               </div>
             </div>
-            {error && <div className="text-red-600 mt-4">{error}</div>}
           </div>
         </form>
       </div>

@@ -23,7 +23,10 @@ export class VendorService {
     // Update vendor profile
     return this.prisma.vendor.update({
       where: { userId },
-      data: input,
+      data: {
+        name: input.name,
+        // add other fields as needed
+      },
     });
   }
 

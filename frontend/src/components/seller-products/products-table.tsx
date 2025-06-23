@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   Table,
+  TableBody,
   TableCell,
   TableHead,
   TableHeader,
@@ -10,16 +11,7 @@ import {
 } from "../ui/table";
 import { Button } from "../ui/button";
 
-export default function ProductsTable({
-  currentProducts,
-  setProductToDelete,
-  setDeleteDialogOpen,
-}: any) {
-  const handleDeleteClick = (product: any) => {
-    setProductToDelete(product);
-    setDeleteDialogOpen(true);
-  };
-
+export default function ProductsTable({ currentProducts, onDeleteClick }: any) {
   const getStatusColor = (status: any) => {
     switch (status) {
       case "Active":
@@ -35,7 +27,7 @@ export default function ProductsTable({
 
   return (
     <div className="bg-white border rounded-lg overflow-hidden shadow-sm">
-      <Table className="w-full">
+      <Table className="overflow-y-scroll">
         <TableHeader className="bg-gray-50 border-b">
           <TableRow>
             <TableHead className="text-gray-600 px-6 py-4 bg-white">
@@ -61,7 +53,7 @@ export default function ProductsTable({
             </TableHead>
           </TableRow>
         </TableHeader>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <TableBody className="bg-white divide-y divide-gray-200 overflow-y-scroll">
           {currentProducts.map((product: any) => (
             <TableRow
               key={product.id}
@@ -80,11 +72,13 @@ export default function ProductsTable({
               </TableCell>
               <TableCell className="px-6 py-2 whitespace-nowrap">
                 <div className="text-sm font-medium text-gray-900">
-                  {product.name}
+                  {product.name.slice(0, 10)}...
                 </div>
               </TableCell>
               <TableCell className="px-6 py-2 whitespace-nowrap">
-                <div className="text-sm text-gray-500">{product.sku}</div>
+                <div className="text-sm text-gray-500">
+                  {product.sku.slice(0, 10)}...
+                </div>
               </TableCell>
               <TableCell className="px-6 py-2 whitespace-nowrap">
                 <div className="text-sm text-gray-900">${product.price}</div>
@@ -112,7 +106,7 @@ export default function ProductsTable({
                     </Button>
                   </Link>
                   <Button
-                    onClick={() => handleDeleteClick(product)}
+                    onClick={() => onDeleteClick(product)}
                     variant="ghost"
                     className="text-red-600 border"
                   >
@@ -122,7 +116,7 @@ export default function ProductsTable({
               </TableCell>
             </TableRow>
           ))}
-        </tbody>
+        </TableBody>
       </Table>
     </div>
   );

@@ -31,7 +31,7 @@ enum Role {
 
 model Vendor {
   id        String    @id @default(uuid())
-  vendorName      String
+  name      String
   user      User      @relation(fields: [userId], references: [id])
   userId    String    @unique
   products  Product[]
