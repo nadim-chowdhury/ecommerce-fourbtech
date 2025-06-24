@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,53 +8,49 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Trash2, Minus, Plus, Store, Tag } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useQuery, useMutation } from "@apollo/client";
+import { MY_CART_QUERY_GQL } from "@/graphql/queries";
+import {
+  UPDATE_CART_ITEM_GQL,
+  REMOVE_FROM_CART_GQL,
+} from "@/graphql/mutations";
+import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ShoppingCart() {
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Wireless Noise-Cancelling Headphones",
-      description: "Black | Premium Edition",
-      price: 249.99,
-      quantity: 1,
-      image: "/api/placeholder/100/100",
-      store: "Tech Gadget Store",
-      selected: false,
-    },
-    {
-      id: 2,
-      name: "Wireless Noise-Cancelling Headphones",
-      description: "Black | Premium Edition",
-      price: 249.99,
-      quantity: 1,
-      image: "/api/placeholder/100/100",
-      store: "Tech Gadget Store",
-      selected: false,
-    },
-    {
-      id: 3,
-      name: "Wireless Noise-Cancelling Headphones",
-      description: "Black | Premium Edition",
-      price: 249.99,
-      quantity: 1,
-      image: "/api/placeholder/100/100",
-      store: "Super Gadgets",
-      selected: false,
-    },
-    {
-      id: 4,
-      name: "Wireless Noise-Cancelling Headphones",
-      description: "Black | Premium Edition",
-      price: 249.99,
-      quantity: 1,
-      image: "/api/placeholder/100/100",
-      store: "Super Gadgets",
-      selected: false,
-    },
-  ]);
-
+  const [cartItems, setCartItems] = useState<any[]>([]);
   const [promoCode, setPromoCode] = useState("");
   const [selectAll, setSelectAll] = useState(false);
+
+  const { data, loading, error } = useQuery(MY_CART_QUERY_GQL);
+
+  const [updateCartItem] = useMutation(UPDATE_CART_ITEM_GQL, {
+    refetchQueries: [{ query: MY_CART_QUERY_GQL }],
+    onError: (err) => toast.error(err.message),
+  });
+
+  const [removeFromCart] = useMutation(REMOVE_FROM_CART_GQL, {
+    refetchQueries: [{ query: MY_CART_QUERY_GQL }],
+    onCompleted: () => toast.success("Item removed from cart."),
+    onError: (err) => toast.error(err.message),
+  });
+
+  useEffect(() => {
+    if (data?.myCart?.items) {
+      const enhancedItems = data.myCart.items.map((item: any) => ({
+        ...item,
+        name: item.product?.name,
+        description: item.product?.description,
+        price: item.product?.price,
+        image:
+          item.product?.imageUrl ||
+          "https://pngimg.com/uploads/box/box_PNG41.png",
+        store: item.product?.vendor?.name,
+        selected: false,
+      }));
+      setCartItems(enhancedItems);
+    }
+  }, [data]);
 
   const handleSelectAll = (checked: any) => {
     setSelectAll(checked);
@@ -69,49 +65,58 @@ export default function ShoppingCart() {
         item.id === id ? { ...item, selected: checked } : item
       )
     );
-
     const updatedItems = cartItems.map((item) =>
       item.id === id ? { ...item, selected: checked } : item
     );
     setSelectAll(updatedItems.every((item) => item.selected));
   };
 
-  const handleQuantityChange = (id: any, change: any) => {
-    setCartItems((items) =>
-      items.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + change) }
-          : item
-      )
-    );
+  const handleQuantityChange = (id: any, newQuantity: number) => {
+    if (newQuantity < 1) return;
+    updateCartItem({
+      variables: { input: { cartItemId: id, quantity: newQuantity } },
+    });
   };
 
   const handleRemoveItem = (id: any) => {
-    setCartItems((items) => items.filter((item) => item.id !== id));
+    removeFromCart({ variables: { cartItemId: id } });
   };
 
   const handleDeleteSelected = () => {
-    setCartItems((items) => items.filter((item) => !item.selected));
+    const selectedIds = cartItems
+      .filter((item) => item.selected)
+      .map((item) => item.id);
+    selectedIds.forEach((id) => handleRemoveItem(id));
     setSelectAll(false);
   };
 
   const selectedCount = cartItems.filter((item) => item.selected).length;
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
+  const subtotal = useMemo(
+    () =>
+      cartItems.reduce(
+        (sum, item) => sum + (item?.price ?? 0) * (item?.quantity ?? 0),
+        0
+      ),
+    [cartItems]
   );
   const shipping = 0;
   const tax = 0;
   const total = subtotal + shipping + tax;
 
-  const groupedItems = cartItems.reduce((groups: any, item: any) => {
-    const store = item.store;
-    if (!groups[store]) {
-      groups[store] = [];
-    }
-    groups[store].push(item);
-    return groups;
-  }, {});
+  const groupedItems = useMemo(
+    () =>
+      cartItems.reduce((groups: any, item: any) => {
+        const store = item?.store ?? "Unknown Store";
+        if (!groups[store]) groups[store] = [];
+        groups[store].push(item);
+        return groups;
+      }, {}),
+    [cartItems]
+  );
+
+  if (loading) return <CartSkeleton />;
+  if (error)
+    return <p className="text-center text-red-500">Error: {error.message}</p>;
 
   return (
     <div className="min-h-screen p-6 pr-16">
@@ -173,34 +178,34 @@ export default function ShoppingCart() {
 
                   <div className="space-y-6">
                     {(storeItems as any).map((item: any) => (
-                      <div key={item.id} className="flex items-center gap-4">
+                      <div key={item?.id} className="flex items-center gap-4">
                         <Checkbox
-                          id={`item-${item.id}`}
-                          checked={item.selected}
+                          id={`item-${item?.id}`}
+                          checked={item?.selected}
                           onCheckedChange={(checked) =>
-                            handleItemSelect(item.id, checked)
+                            handleItemSelect(item?.id, checked)
                           }
                         />
 
                         <div className="w-20 h-20 bg-gray-200 rounded-lg flex-shrink-0 p-2">
                           <Image
-                            src="https://pngimg.com/uploads/box/box_PNG41.png"
-                            alt="Demo Image"
-                            width={360}
-                            height={360}
+                            src={item?.image}
+                            alt={item?.name ?? "Product"}
+                            width={80}
+                            height={80}
                             className="w-full h-full object-cover rounded-lg"
                           />
                         </div>
 
                         <div className="flex-1 min-w-0">
                           <h3 className="font-semibold text-gray-900 mb-1">
-                            {item.name}
+                            {item?.name ?? "Unnamed Product"}
                           </h3>
                           <p className="text-sm text-gray-600 mb-2">
-                            {item.description}
+                            {item?.description ?? "No description available"}
                           </p>
                           <p className="text-lg font-bold text-gray-900">
-                            ${item.price}
+                            ${item?.price?.toFixed(2) ?? "0.00"}
                           </p>
                         </div>
 
@@ -208,19 +213,23 @@ export default function ShoppingCart() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleQuantityChange(item.id, -1)}
-                            disabled={item.quantity <= 1}
+                            onClick={() =>
+                              handleQuantityChange(item?.id, item?.quantity - 1)
+                            }
+                            disabled={item?.quantity <= 1}
                             className="w-8 h-8 p-0"
                           >
                             <Minus className="w-4 h-4" />
                           </Button>
                           <span className="w-8 text-center font-medium">
-                            {item.quantity}
+                            {item?.quantity}
                           </span>
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleQuantityChange(item.id, 1)}
+                            onClick={() =>
+                              handleQuantityChange(item?.id, item?.quantity + 1)
+                            }
                             className="w-8 h-8 p-0"
                           >
                             <Plus className="w-4 h-4" />
@@ -230,7 +239,7 @@ export default function ShoppingCart() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleRemoveItem(item.id)}
+                          onClick={() => handleRemoveItem(item?.id)}
                           className="text-red-600 hover:text-red-700 hover:bg-red-50 p-2"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -307,3 +316,20 @@ export default function ShoppingCart() {
     </div>
   );
 }
+
+const CartSkeleton = () => (
+  <div className="min-h-screen p-6 pr-16">
+    <div className="max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-6">
+          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-48 w-full" />
+          <Skeleton className="h-48 w-full" />
+        </div>
+        <div className="lg:col-span-1">
+          <Skeleton className="h-96 w-full" />
+        </div>
+      </div>
+    </div>
+  </div>
+);

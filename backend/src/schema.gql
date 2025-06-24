@@ -2,9 +2,36 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input AddToCartInput {
+  productId: String!
+  quantity: Float!
+}
+
+input AddToWishlistInput {
+  productId: String!
+}
+
 type AuthResponse {
   access_token: String!
   user: User!
+}
+
+type Cart {
+  createdAt: DateTime!
+  id: String!
+  items: [CartItem!]!
+  updatedAt: DateTime!
+  userId: String!
+}
+
+type CartItem {
+  cartId: String!
+  createdAt: DateTime!
+  id: String!
+  product: Product!
+  productId: String!
+  quantity: Float!
+  updatedAt: DateTime!
 }
 
 input CreateOrderInput {
@@ -57,13 +84,18 @@ input LoginInput {
 }
 
 type Mutation {
+  addToCart(input: AddToCartInput!): CartItem!
+  addToWishlist(input: AddToWishlistInput!): Wishlist!
   createOrder(input: CreateOrderInput!): Order!
   createProduct(input: CreateProductInput!): Product!
   createVendor(input: CreateVendorInput!): Vendor!
   deleteVendor: Vendor!
   login(input: LoginInput!): AuthResponse!
   register(input: RegisterInput!): AuthResponse!
+  removeFromCart(cartItemId: String!): CartItem!
+  removeFromWishlist(input: RemoveFromWishlistInput!): Wishlist!
   removeProduct(id: String!): Product!
+  updateCartItem(input: UpdateCartItemInput!): CartItem!
   updateOrderStatus(id: String!, input: UpdateOrderStatusInput!): Order!
   updateProduct(id: String!, input: UpdateProductInput!): Product!
   updateVendor(input: UpdateVendorInput!): Vendor!
@@ -113,6 +145,7 @@ type Product {
   price: Float!
   ram: String
   ram2: String
+  reviews: [Review!]
   salePrice: Float
   seoDescription: String
   seoTitle: String
@@ -121,12 +154,15 @@ type Product {
   storage: String
   tags: [String!]
   updatedAt: DateTime!
+  vendor: Vendor!
   vendorId: String!
 }
 
 type Query {
   hello: String!
+  myCart: Cart!
   myOrders: [Order!]!
+  myWishlist: Wishlist!
   order(id: String!): Order!
   orderStats: OrderStats!
   orders: [Order!]!
@@ -144,6 +180,24 @@ input RegisterInput {
   name: String!
   password: String!
   role: String!
+}
+
+input RemoveFromWishlistInput {
+  wishlistItemId: String!
+}
+
+type Review {
+  comment: String
+  createdAt: DateTime!
+  id: String!
+  productId: String!
+  rating: Float!
+  userId: String!
+}
+
+input UpdateCartItemInput {
+  cartItemId: String!
+  quantity: Float!
 }
 
 input UpdateOrderStatusInput {
@@ -195,4 +249,18 @@ type Vendor {
   name: String!
   updatedAt: DateTime!
   userId: String!
+}
+
+type Wishlist {
+  id: String!
+  items: [WishlistItem!]!
+  userId: String!
+}
+
+type WishlistItem {
+  createdAt: DateTime!
+  id: String!
+  product: Product!
+  productId: String!
+  wishlistId: String!
 }

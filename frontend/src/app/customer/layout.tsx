@@ -15,9 +15,9 @@ export default function SellerLayout({
     <ProtectedRoute allowedRoles={["CUSTOMER"]}>
       <DashboardHeader />
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center">
         <DashboardNavbar className="pl-16 w-full" />
-        <div className="flex items-center gap-4 pr-16">
+        <div className="flex items-center gap-4 pr-16 border-b bg-white h-[78.4px] pl-4">
           <Link
             href="/customer/wishlist"
             className="hover:text-red-500 transition-colors"

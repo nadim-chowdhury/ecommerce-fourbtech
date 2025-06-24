@@ -16,6 +16,8 @@ import { CategoriesModule } from './categories/categories.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { PaymentsModule } from './payments/payments.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { CartModule } from './cart/cart.module';
+import { WishlistModule } from './wishlist/wishlist.module';
 
 @Module({
   imports: [
@@ -42,6 +44,8 @@ import { UploadsModule } from './uploads/uploads.module';
     ReviewsModule,
     PaymentsModule,
     UploadsModule,
+    CartModule,
+    WishlistModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

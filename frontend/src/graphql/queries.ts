@@ -12,6 +12,30 @@ export const MY_VENDOR_QUERY_GQL = gql`
   }
 `;
 
+export const ALL_PRODUCTS_QUERY_GQL = gql`
+  query AllProducts {
+    products {
+      id
+      name
+      description
+      sku
+      price
+      salePrice
+      stock
+      isActive
+      category
+      brand
+      model
+      condition
+      imageUrl
+      tags
+      vendorId
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 export const SELLER_PRODUCTS_QUERY_GQL = gql`
   query SellerProducts {
     products {
@@ -67,6 +91,50 @@ export const PRODUCT_QUERY_GQL = gql`
       seoTitle
       seoDescription
       imageUrl
+    }
+  }
+`;
+
+export const MY_CART_QUERY_GQL = gql`
+  query MyCart {
+    myCart {
+      id
+      items {
+        id
+        quantity
+        product {
+          id
+          name
+          description
+          price
+          imageUrl
+          stock
+          vendorId
+        }
+      }
+    }
+  }
+`;
+
+export const MY_WISHLIST_QUERY_GQL = gql`
+  query MyWishlist {
+    myWishlist {
+      id
+      items {
+        id
+        product {
+          id
+          name
+          description
+          price
+          imageUrl
+          stock
+          vendor {
+            id
+            name
+          }
+        }
+      }
     }
   }
 `;

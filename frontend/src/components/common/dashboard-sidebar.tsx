@@ -13,11 +13,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // import { Button } from "../ui/button";
 
 export default function DashboardSidebar() {
-  const [userRole] = useState<any>("SELLER");
+  const [userRole, setUserRole] = useState<any>("CUSTOMER");
 
   const pathname = usePathname();
 
@@ -138,11 +138,16 @@ export default function DashboardSidebar() {
     );
   };
 
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    setUserRole(user.role);
+  }, []);
+
   return (
     <div className="bg-white min-h-screen border-r transition-all duration-300 flex flex-col pl-14 w-[360px] h-full sticky top-0">
       {/* Main Navigation */}
       <nav className="flex-1 py-4 space-y-1">
-        {(userRole === "SELLER" || userRole) &&
+        {userRole === "SELLER" &&
           sellerSidebarItems.map((item) => (
             <SidebarItem
               key={item.id}
@@ -151,7 +156,7 @@ export default function DashboardSidebar() {
             />
           ))}
 
-        {(userRole === "CUSTOMER" || !userRole) &&
+        {userRole === "CUSTOMER" &&
           customerSidebarItems.map((item) => (
             <SidebarItem
               key={item.id}

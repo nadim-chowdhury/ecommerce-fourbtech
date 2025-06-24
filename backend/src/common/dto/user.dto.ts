@@ -62,6 +62,24 @@ export class CreateUserInput {
   role: string;
 }
 
+@ObjectType()
+export class Vendor {
+  @Field()
+  id: string;
+
+  @Field()
+  name: string;
+
+  @Field()
+  userId: string;
+
+  @Field()
+  createdAt: Date;
+
+  @Field()
+  updatedAt: Date;
+}
+
 @InputType()
 export class UpdateVendorInput {
   @Field({ nullable: true })

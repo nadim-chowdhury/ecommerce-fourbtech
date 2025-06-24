@@ -1,7 +1,7 @@
 import { Resolver, Mutation, Args, Context, Query } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { VendorService } from './vendor.service';
-import { Vendor } from '../common/dto/product.dto';
+import { Vendor } from '../common/dto/user.dto';
 import {
   UpdateVendorInput,
   CreateVendorInput,

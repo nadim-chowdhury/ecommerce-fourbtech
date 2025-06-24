@@ -104,3 +104,69 @@ export const CREATE_VENDOR_MUTATION_GQL = gql`
     }
   }
 `;
+
+export const ADD_TO_CART_GQL = gql`
+  mutation AddToCart($input: AddToCartInput!) {
+    addToCart(input: $input) {
+      id
+      quantity
+      product {
+        id
+        name
+        price
+        imageUrl
+        stock
+      }
+    }
+  }
+`;
+
+export const UPDATE_CART_ITEM_GQL = gql`
+  mutation UpdateCartItem($input: UpdateCartItemInput!) {
+    updateCartItem(input: $input) {
+      id
+      quantity
+      product {
+        id
+        name
+        price
+        imageUrl
+        stock
+      }
+    }
+  }
+`;
+
+export const REMOVE_FROM_CART_GQL = gql`
+  mutation RemoveFromCart($cartItemId: String!) {
+    removeFromCart(cartItemId: $cartItemId) {
+      id
+    }
+  }
+`;
+
+export const ADD_TO_WISHLIST_GQL = gql`
+  mutation AddToWishlist($input: AddToWishlistInput!) {
+    addToWishlist(input: $input) {
+      id
+      items {
+        id
+        product {
+          id
+          name
+        }
+      }
+    }
+  }
+`;
+
+export const REMOVE_FROM_WISHLIST_GQL = gql`
+  mutation RemoveFromWishlist($input: RemoveFromWishlistInput!) {
+    removeFromWishlist(input: $input) {
+      id
+      items {
+        id
+      }
+    }
+  }
+`;

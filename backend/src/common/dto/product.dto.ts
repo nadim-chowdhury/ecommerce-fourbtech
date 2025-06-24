@@ -7,6 +7,8 @@ import {
   Min,
   IsUrl,
 } from 'class-validator';
+import { Vendor } from './user.dto';
+import { Review } from './review.dto';
 
 @ObjectType()
 export class Product {
@@ -30,6 +32,9 @@ export class Product {
 
   @Field()
   vendorId: string;
+
+  @Field(() => Vendor)
+  vendor: Vendor;
 
   @Field()
   stock: number;
@@ -82,23 +87,8 @@ export class Product {
   @Field(() => String, { nullable: true })
   features?: string;
 
-  @Field()
-  createdAt: Date;
-
-  @Field()
-  updatedAt: Date;
-}
-
-@ObjectType()
-export class Vendor {
-  @Field()
-  id: string;
-
-  @Field()
-  name: string;
-
-  @Field()
-  userId: string;
+  @Field(() => [Review], { nullable: true })
+  reviews: Review[];
 
   @Field()
   createdAt: Date;

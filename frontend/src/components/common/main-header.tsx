@@ -165,39 +165,37 @@ export default function MainHeader() {
         {/* Icons */}
         {isAuthenticated && user.role === "CUSTOMER" && (
           <div className="flex items-center gap-2">
-            <div>
-              <Link href="/customer/cart" className="relative group">
-                <Button variant={"outline"}>
-                  <ShoppingCart className="w-6 h-6 text-gray-700 group-hover:text-red-600 transition" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">
-                      {cartCount}
-                    </span>
-                  )}
-                </Button>
-              </Link>
-              <Link href="/customer/wishlist" className="relative">
-                <Button variant={"outline"}>
-                  <Heart
-                    className={`w-6 h-6 ${
-                      wishlistCount > 0
-                        ? "text-red-600 fill-red-100"
-                        : "text-gray-400"
-                    }`}
-                  />
-                </Button>
-                {wishlistCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">
-                    {wishlistCount}
+            <Link href="/customer/cart" className="relative group">
+              <Button variant={"outline"}>
+                <ShoppingCart className="w-6 h-6 text-gray-700 group-hover:text-red-600 transition" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">
+                    {cartCount}
                   </span>
                 )}
-              </Link>
-              <Link href={`/${user?.role.toLowerCase()}/profile`}>
-                <Button variant={"outline"}>
-                  <User className="w-6 h-6 text-gray-700 hover:text-red-600 transition" />
-                </Button>
-              </Link>
-            </div>
+              </Button>
+            </Link>
+            <Link href="/customer/wishlist" className="relative">
+              <Button variant={"outline"}>
+                <Heart
+                  className={`w-6 h-6 ${
+                    wishlistCount > 0
+                      ? "text-red-600 fill-red-100"
+                      : "text-gray-400"
+                  }`}
+                />
+              </Button>
+              {wishlistCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+            <Link href={`/${user?.role.toLowerCase()}/profile`}>
+              <Button variant={"outline"}>
+                <User className="w-6 h-6 text-gray-700 hover:text-red-600 transition" />
+              </Button>
+            </Link>
           </div>
         )}
 
@@ -223,7 +221,7 @@ export default function MainHeader() {
                 className="h-10 rounded-full border border-gray-300 text-gray-700 hover:bg-gray-100 font-medium transition"
                 variant={`ghost`}
               >
-                <LayoutDashboard className="w-4 h-4" />
+                <LayoutDashboard className="w-4 h-4" /> Dashboard
               </Button>
             </Link>
           </>
